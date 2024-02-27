@@ -4,10 +4,11 @@ function gameBoard() {
 	const coordinates = []; //stores the cooordinates
 	const ships = []; //stoers the created ship objects
 	const placedShips = []; //stores the placed ship indexes
+	const attackedCoordinates = [];
 	function addCoordinates() {
 		for (let i = 0; i < 8; i++) {
 			for (let j = 0; j < 8; j++) {
-				coordinates.push({ i, j, placed: undefined, hit: false });
+				coordinates.push({ i, j, placed: undefined, attacked: false });
 			}
 		}
 	}
@@ -73,9 +74,17 @@ function gameBoard() {
 			coordinates[element].placed = shipIndex;
 		});
 	}
-	const attackedCoordinates = [];
+
 	function receiveAttack(co) {
-		attackedCoordinates.push(co);
+		// attackedCoordinates.push(co);
+		let coIndex = findCoIndex(co);
+		if (!coordinates[coIndex].attacked) {
+			coordinates[coIndex].attacked = true;
+			if (typeof coordinates[coIndex].placed === "number") {
+				let shipIndex = coordinates[coIndex].placed;
+				ships[shipIndex].hit();
+			}
+		}
 	}
 
 	return {
