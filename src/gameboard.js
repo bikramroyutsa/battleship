@@ -86,18 +86,21 @@ function gameBoard() {
 			}
 		}
 	}
-
+	function allSunk() {
+		let allsunk = false;
+		ships.forEach((item) => {
+			if (item.sunk === true) allSunk = true;
+		});
+		return allsunk;
+	}
 	return {
-		ships,
 		coordinates,
 		placedShips,
-		calculateCos,
-		findShipIndex,
 		createShips,
 		addCoordinates,
 		placeShip,
 		receiveAttack,
-		findShipIndex,
+		allSunk,
 	};
 }
 
