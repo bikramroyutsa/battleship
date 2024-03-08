@@ -1,0 +1,23 @@
+body {
+	background-color: antiquewhite;
+}
+.gameboards {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 100px;
+}
+.gameboard-interface {
+	display: grid;
+	grid-template-columns: repeat(8, 50px);
+}
+.cell {
+	border: 2px solid black;
+	height: 50px;
+	background-color: aquamarine;
+}
+.cell:hover {
+	background-color: aqua;
+}
+.cell:focus {
+	background-color: antiquewhite;
+}

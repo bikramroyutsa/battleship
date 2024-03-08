@@ -1,10 +1,13 @@
 import gameBoard from "./gameboard.js";
 import helperFunction from "./helper-functions.js";
-
+import ship from "./ship.js";
 class Player {
 	constructor(name) {
 		this.name = name;
+		this.gameBoard = gameBoard();
+		this.gameBoard.addCoordinates();
 	}
+
 	attack() {}
 }
 class Ai extends Player {
