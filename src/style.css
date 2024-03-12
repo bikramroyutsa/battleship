@@ -21,3 +21,18 @@ body {
 .cell:focus {
 	background-color: antiquewhite;
 }
+.ships-container {
+	border: 1px solid violet;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: 50px;
+}
+.ship {
+	background-color: burlywood;
+	height: 50px;
+	min-width: 50px;
+}
+.ship:hover {
+	background-color: pink;
+}

@@ -18,6 +18,18 @@ const helperFunction = (() => {
 		if (arr1[0] === arr2[0] && arr1[1] === arr2[1]) return true;
 		else return false;
 	}
-	return { getRandomInt, includesArray };
+	function generateCoord() {
+		while (true) {
+			let x = getRandomInt(8);
+			let y = getRandomInt(8);
+			return [x, y];
+		}
+	}
+	function randomDirection() {
+		const randomNumber = Math.random();
+		return randomNumber < 0.5 ? "horizontal" : "vertical";
+	}
+
+	return { getRandomInt, includesArray, generateCoord, randomDirection };
 })();
 export default helperFunction;

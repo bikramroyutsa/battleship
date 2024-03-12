@@ -1,9 +1,9 @@
 import ship from "./ship.js";
 
 function gameBoard() {
-	const coordinates = []; //stores the cooordinates
+	let coordinates = []; //stores the cooordinates
 	const ships = []; //stoers the created ship objects
-	const placedShips = []; //stores the placed ship indexes
+	let placedShips = []; //stores the placed ship indexes
 	const attackedCoordinates = [];
 	function addCoordinates() {
 		for (let i = 0; i < 8; i++) {
@@ -26,14 +26,25 @@ function gameBoard() {
 
 		if (alignment == "horizontal") {
 			for (let i = 1; i < shipLength; i++) {
-				allCoordinates.push([coord[0] + i, coord[1]]);
+				let newCoordinate = [coord[0] + i, coord[1]];
+				if (newCoordinate[0] > 7 || newCoordinate[1] > 7) {
+					allCoordinates = undefined;
+					break;
+				}
+				allCoordinates.push(newCoordinate);
 			}
 		}
 		if (alignment == "vertical") {
 			for (let i = 1; i < shipLength; i++) {
-				allCoordinates.push([coord[0], coord[1] + i]);
+				let newCoordinate = [coord[0], coord[1] + i];
+				if (newCoordinate[0] > 7 || newCoordinate[1] > 7) {
+					allCoordinates = undefined;
+					break;
+				}
+				allCoordinates.push(newCoordinate);
 			}
 		}
+
 		return allCoordinates;
 	};
 
@@ -66,13 +77,22 @@ function gameBoard() {
 	function placeShip(coord, shipLength, alignment) {
 		const shipIndex = findShipIndex(shipLength);
 		const allCoordinates = calculateCos(coord, shipLength, alignment);
-		const allCoIndexes = allCoordinates.map((element) => {
-			return findCoIndex(element);
-		});
-		placedShips.push(shipIndex);
-		allCoIndexes.forEach((element) => {
-			coordinates[element].placed = shipIndex;
-		});
+		if (allCoordinates === undefined) return undefined;
+		else {
+			const allCoIndexes = allCoordinates.map((element) => {
+				return findCoIndex(element);
+			});
+			for (let i = 0; i < allCoIndexes.length; i++) {
+				if (coordinates[allCoIndexes[i]].placed !== undefined) {
+					return undefined;
+				}
+			}
+			for (let i = 0; i < allCoIndexes.length; i++) {
+				coordinates[allCoIndexes[i]].placed = shipIndex;
+			}
+			placedShips.push(shipIndex);
+			return null;
+		}
 	}
 
 	function receiveAttack(co) {
@@ -93,7 +113,13 @@ function gameBoard() {
 		});
 		return allsunk;
 	}
+	function resetGameboard() {
+		coordinates = [];
+		addCoordinates();
+		placedShips = [];
+	}
 	return {
+		ships,
 		coordinates,
 		placedShips,
 		createShips,
@@ -101,6 +127,7 @@ function gameBoard() {
 		placeShip,
 		receiveAttack,
 		allSunk,
+		resetGameboard,
 	};
 }
 

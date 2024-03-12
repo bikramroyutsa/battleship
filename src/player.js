@@ -6,6 +6,7 @@ class Player {
 		this.name = name;
 		this.gameBoard = gameBoard();
 		this.gameBoard.addCoordinates();
+		this.gameBoard.createShips();
 	}
 
 	attack() {}
