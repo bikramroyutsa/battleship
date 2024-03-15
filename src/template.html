@@ -7,28 +7,31 @@
 		<title>Battleship</title>
 	</head>
 	<body>
-		<form action="" class="player-form">
-			<div class="p1-name">
-				<label for="input-player-1-name">Player 1</label>
-				<input
-					type="text"
-					id="input-player-1-name"
-					name="input-player-1-name"
-					value="Player 1"
-				/>
-			</div>
-			<div class="p2-name">
-				<label for="input-player-2-name">Player 2</label>
-				<input
-					type="text"
-					id="input-player-2-name"
-					name="input-player-2-name"
-					value="Player 2"
-				/>
-			</div>
-			<button type="submit" class="start-game">Start game</button>
-		</form>
-		<div class="gameboards">
+		<div>
+			<form action="" class="player-form">
+				<div class="p1-name">
+					<label for="input-player-1-name">Player 1</label>
+					<input
+						type="text"
+						id="input-player-1-name"
+						name="input-player-1-name"
+						value="Player 1"
+					/>
+				</div>
+
+				<div class="p2-name">
+					<label for="input-player-2-name">Player 2</label>
+					<input
+						type="text"
+						id="input-player-2-name"
+						name="input-player-2-name"
+						value="Player 2"
+					/>
+				</div>
+				<button type="submit" class="start-game">Start game</button>
+			</form>
+			<h1 class="turn"></h1>
 		</div>
+		<div class="gameboards"></div>
 	</body>
 </html>

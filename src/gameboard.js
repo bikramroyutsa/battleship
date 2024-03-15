@@ -100,11 +100,12 @@ function gameBoard() {
 		let coIndex = findCoIndex(co);
 		if (!coordinates[coIndex].attacked) {
 			coordinates[coIndex].attacked = true;
-			if (typeof coordinates[coIndex].placed === "number") {
+			if (coordinates[coIndex].placed >= 0) {
 				let shipIndex = coordinates[coIndex].placed;
 				ships[shipIndex].hit();
 			}
-		}
+			return "attacked now";
+		} else return "already attacked, attack somewhere else";
 	}
 	function allSunk() {
 		let allsunk = false;

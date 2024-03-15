@@ -12,15 +12,28 @@ const mainGameLoop = (() => {
 		player1 = new Player(document.querySelector("#input-player-1-name").value);
 		player2 = new Player(document.querySelector("#input-player-2-name").value);
 		addPlayersToDOM(player1, player2);
+
+		const btnAttack = document.createElement("button");
+		btnAttack.textContent = "Start attacking";
+		btnAttack.classList.add("start-attack");
+		document.querySelector(".player1").appendChild(btnAttack);
+
 		displayGameboards(player1, "1");
 		displayGameboards(player2, "2");
 		addShipsToContainer(player1, 1);
 		addShipsToContainer(player2, 2);
-		document.querySelectorAll(".cell").forEach((item) => {
-			item.addEventListener("click", () => {
-				console.log("attacked cell!!!!");
-			});
+
+		btnAttack.addEventListener("click", () => {
+			player1.gameBoard.placedShips.length === 0
+				? alert("place ships first")
+				: (() => {
+						document
+							.querySelectorAll(".btn-place-ships-randomly")
+							.forEach((item) => (item.disabled = true));
+						startTurn(player1, player2);
+				  })();
 		});
+
 		document.querySelectorAll(".btn-place-ships-randomly").forEach((btn) => {
 			btn.addEventListener("click", (e) => {
 				e.target.dataset.number == 1
@@ -32,6 +45,45 @@ const mainGameLoop = (() => {
 		});
 	});
 })();
+function startTurn(_player1, _player2) {
+	let turn = 1;
+	alert(`turn = ${turn}`);
+	const player1Cells = document.querySelectorAll('[data-player="1"]');
+	const player2Cells = document.querySelectorAll('[data-player="2"]');
+	const domTurnText = document.querySelector(".turn");
+
+	document.querySelectorAll(".cell").forEach((item) => {
+		item.addEventListener("click", (e) => {
+			handleAttack(e);
+		});
+	});
+	function updateTurn(i) {
+		turn += 1;
+		i === 1
+			? alert(`player 1 can attack player 2`)
+			: alert(`player 2 can attack player 1`);
+	}
+
+	function handleAttack(e) {
+		let coordinate = [e.target.dataset.i, e.target.dataset.j];
+		let dataPlayer = e.target.dataset.player;
+		// if turn is odd, player 1 can atack player 2
+		if (dataPlayer == 2 && turn % 2 !== 0) {
+			let status = attack(coordinate, _player2, e);
+			status == "attacked now" ? updateTurn(2) : alert(status);
+		}
+		if (dataPlayer == 1 && turn % 2 === 0) {
+			let status = attack(coordinate, _player1, e);
+			status == "attacked now" ? updateTurn(1) : alert(status);
+		}
+	}
+}
+
+function attack(_coordinate, _p, e) {
+	let status = _p.gameBoard.receiveAttack(_coordinate);
+	e.target.style.backgroundColor = "white";
+	return status;
+}
 function placeShipsRandomly(player, num) {
 	player.gameBoard = gameBoard();
 	player.gameBoard.addCoordinates();
@@ -67,16 +119,16 @@ function displayGameboards(player, num) {
 	const gbInterface = document.createElement("div");
 	gbInterface.classList.add("gameboard-interface");
 	gbInterface.classList.add(`gi-${num}`);
-	// console.log(player.gameBoard.coordinates);
 	player.gameBoard.coordinates.forEach((item) => {
 		const cell = document.createElement("div");
-		cell.textContent = `${item.i}, ${item.j}`;
+		// cell.textContent = `${item.i}, ${item.j}`;
 		cell.classList.add("cell");
+		cell.dataset.player = num;
 		cell.dataset.i = item.i;
 		cell.dataset.j = item.j;
 		if (item.placed !== undefined) {
 			cell.style.backgroundColor = "yellow";
-			cell.textContent = `index ${item.placed}`;
+			cell.textContent = `${item.placed}`;
 		}
 		gbInterface.appendChild(cell);
 	});

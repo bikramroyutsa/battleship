@@ -5,6 +5,7 @@ const ship = (length) => {
 	const hit = () => {
 		if (hits < length) hits++;
 		if (hits === length) sunk = true;
+
 	};
 
 	const showHits = () => hits;
