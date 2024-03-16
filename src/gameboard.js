@@ -108,17 +108,9 @@ function gameBoard() {
 		} else return "already attacked, attack somewhere else";
 	}
 	function allSunk() {
-		let allsunk = false;
-		ships.forEach((item) => {
-			if (item.sunk === true) allSunk = true;
-		});
-		return allsunk;
+		return ships.every((ship) => ship.isSunk() === true);
 	}
-	function resetGameboard() {
-		coordinates = [];
-		addCoordinates();
-		placedShips = [];
-	}
+
 	return {
 		ships,
 		coordinates,
@@ -128,7 +120,6 @@ function gameBoard() {
 		placeShip,
 		receiveAttack,
 		allSunk,
-		resetGameboard,
 	};
 }
 

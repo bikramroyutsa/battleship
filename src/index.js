@@ -47,23 +47,25 @@ const mainGameLoop = (() => {
 })();
 function startTurn(_player1, _player2) {
 	let turn = 1;
-	alert(`turn = ${turn}`);
-	const player1Cells = document.querySelectorAll('[data-player="1"]');
-	const player2Cells = document.querySelectorAll('[data-player="2"]');
 	const domTurnText = document.querySelector(".turn");
-
+	domTurnText.textContent = `${_player1.name}'s turn`;
 	document.querySelectorAll(".cell").forEach((item) => {
-		item.addEventListener("click", (e) => {
-			handleAttack(e);
-		});
+		item.addEventListener("click", handleAttack);
 	});
 	function updateTurn(i) {
 		turn += 1;
 		i === 1
-			? alert(`player 1 can attack player 2`)
-			: alert(`player 2 can attack player 1`);
+			? (domTurnText.textContent = `${_player1.name}'s turn`)
+			: (domTurnText.textContent = `${_player2.name}'s turn`);
+		if (_player1.gameBoard.allSunk()) handleWin(_player2);
+		if (_player2.gameBoard.allSunk()) handleWin(_player1);
 	}
-
+	function handleWin(_player) {
+		alert(`${_player.name} wins`);
+		document.querySelectorAll(".cell").forEach((item) => {
+			item.removeEventListener("click", handleAttack);
+		});
+	}
 	function handleAttack(e) {
 		let coordinate = [e.target.dataset.i, e.target.dataset.j];
 		let dataPlayer = e.target.dataset.player;
@@ -81,7 +83,10 @@ function startTurn(_player1, _player2) {
 
 function attack(_coordinate, _p, e) {
 	let status = _p.gameBoard.receiveAttack(_coordinate);
-	e.target.style.backgroundColor = "white";
+
+	e.target.classList.contains("placed")
+		? (e.target.style.backgroundColor = "red")
+		: (e.target.style.backgroundColor = "white");
 	return status;
 }
 function placeShipsRandomly(player, num) {
@@ -128,6 +133,7 @@ function displayGameboards(player, num) {
 		cell.dataset.j = item.j;
 		if (item.placed !== undefined) {
 			cell.style.backgroundColor = "yellow";
+			cell.classList.add("placed");
 			cell.textContent = `${item.placed}`;
 		}
 		gbInterface.appendChild(cell);
