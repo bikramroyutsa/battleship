@@ -1,6 +1,6 @@
+import gameBoard from "./gameboard.js";
 import helperFunction from "./helper-functions.js";
 import { Player } from "./player.js";
-import gameBoard from "./gameboard.js";
 import "./style.css";
 const btnStartGame = document.querySelector(".start-game");
 const domGameboards = document.querySelector(".gameboards");
@@ -22,7 +22,7 @@ const mainGameLoop = (() => {
 		displayGameboards(player2, "2");
 		addShipsToContainer(player1, 1);
 		addShipsToContainer(player2, 2);
-
+		//logic for attack button
 		btnAttack.addEventListener("click", () => {
 			player1.gameBoard.placedShips.length === 0
 				? alert("place ships first")
@@ -33,7 +33,7 @@ const mainGameLoop = (() => {
 						startTurn(player1, player2);
 				  })();
 		});
-
+		//add logic to the place random buttons
 		document.querySelectorAll(".btn-place-ships-randomly").forEach((btn) => {
 			btn.addEventListener("click", (e) => {
 				e.target.dataset.number == 1
@@ -57,14 +57,28 @@ function startTurn(_player1, _player2) {
 		i === 1
 			? (domTurnText.textContent = `${_player1.name}'s turn`)
 			: (domTurnText.textContent = `${_player2.name}'s turn`);
-		if (_player1.gameBoard.allSunk()) handleWin(_player2);
-		if (_player2.gameBoard.allSunk()) handleWin(_player1);
 	}
 	function handleWin(_player) {
-		alert(`${_player.name} wins`);
+		setTimeout(() => {
+			alert(`${_player.name} wins`);
+		}, 100);
+
 		document.querySelectorAll(".cell").forEach((item) => {
 			item.removeEventListener("click", handleAttack);
 		});
+	}
+	function handleStatus(_status, n) {
+		if (_status === "attacked ship") {
+			setTimeout(() => {
+				console.log("you can attack again");
+			}, 200);
+		} else if (_status === "already attacked, attack somewhere else") {
+			console.log(_status);
+		} else {
+			updateTurn(n);
+		}
+		if (_player1.gameBoard.allSunk()) handleWin(_player2);
+		if (_player2.gameBoard.allSunk()) handleWin(_player1);
 	}
 	function handleAttack(e) {
 		let coordinate = [e.target.dataset.i, e.target.dataset.j];
@@ -72,11 +86,12 @@ function startTurn(_player1, _player2) {
 		// if turn is odd, player 1 can atack player 2
 		if (dataPlayer == 2 && turn % 2 !== 0) {
 			let status = attack(coordinate, _player2, e);
-			status == "attacked now" ? updateTurn(2) : alert(status);
+			handleStatus(status, 2);
 		}
+		//player 2 attacks player 1
 		if (dataPlayer == 1 && turn % 2 === 0) {
 			let status = attack(coordinate, _player1, e);
-			status == "attacked now" ? updateTurn(1) : alert(status);
+			handleStatus(status, 1);
 		}
 	}
 }
@@ -96,8 +111,8 @@ function placeShipsRandomly(player, num) {
 	for (let i = 0; i < player.gameBoard.ships.length; i++) {
 		let ship = player.gameBoard.ships[i];
 		placeSingleShip(player, ship);
-		displayShipsOnGameboard(player, num);
 	}
+	displayShipsOnGameboard(player, num);
 }
 function placeSingleShip(_player, _ship) {
 	let tempCoord = helperFunction.generateCoord();
@@ -149,16 +164,16 @@ function addShipsToContainer(player, num) {
 	btnPlaceShipRandomly.classList.add("btn-place-ships-randomly");
 	playerInterface.appendChild(btnPlaceShipRandomly);
 
-	const container = document.createElement("div");
-	container.classList.add("ships-container");
-	player.gameBoard.ships.forEach((item) => {
-		const ship = document.createElement("div");
-		ship.classList.add("ship");
-		ship.textContent = "ship";
-		ship.style.width = 50 * item.length + "px";
-		container.appendChild(ship);
-	});
-	playerInterface.appendChild(container);
+	// const container = document.createElement("div");
+	// container.classList.add("ships-container");
+	// player.gameBoard.ships.forEach((item) => {
+	// 	const ship = document.createElement("div");
+	// 	ship.classList.add("ship");
+	// 	ship.textContent = "ship";
+	// 	ship.style.width = 50 * item.length + "px";
+	// 	container.appendChild(ship);
+	// });
+	// playerInterface.appendChild(container);
 }
 function displayShipsOnGameboard(player, num) {
 	const gameBoardInterface = document.querySelector(`.gi-${num}`);

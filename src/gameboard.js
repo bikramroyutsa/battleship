@@ -76,6 +76,8 @@ function gameBoard() {
 
 	function placeShip(coord, shipLength, alignment) {
 		const shipIndex = findShipIndex(shipLength);
+		//calculate the possible coordinates associated with that coordinate
+		//for alignment and length
 		const allCoordinates = calculateCos(coord, shipLength, alignment);
 		if (allCoordinates === undefined) return undefined;
 		else {
@@ -103,8 +105,9 @@ function gameBoard() {
 			if (coordinates[coIndex].placed >= 0) {
 				let shipIndex = coordinates[coIndex].placed;
 				ships[shipIndex].hit();
+				return "attacked ship";
 			}
-			return "attacked now";
+			return "attacked cell";
 		} else return "already attacked, attack somewhere else";
 	}
 	function allSunk() {
