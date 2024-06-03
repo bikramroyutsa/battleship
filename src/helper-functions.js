@@ -29,7 +29,14 @@ const helperFunction = (() => {
 		const randomNumber = Math.random();
 		return randomNumber < 0.5 ? "horizontal" : "vertical";
 	}
+	function generateSmartCo(previousCo) {}
 
-	return { getRandomInt, includesArray, generateCoord, randomDirection };
+	return {
+		getRandomInt,
+		includesArray,
+		generateCoord,
+		randomDirection,
+		generateSmartCo,
+	};
 })();
 export default helperFunction;

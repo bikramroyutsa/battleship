@@ -4,6 +4,7 @@ import { Player } from "./player.js";
 import "./style.css";
 const btnStartGame = document.querySelector(".start-game");
 const domGameboards = document.querySelector(".gameboards");
+const turnDisplay = document.querySelector(".turn-display");
 const mainGameLoop = (() => {
 	let player1 = undefined;
 	let player2 = undefined;
@@ -30,7 +31,7 @@ const mainGameLoop = (() => {
 						document
 							.querySelectorAll(".btn-place-ships-randomly")
 							.forEach((item) => (item.disabled = true));
-						startTurn(player1, player2);
+						playWithAi(player1, player2);
 				  })();
 		});
 		//add logic to the place random buttons
@@ -45,6 +46,54 @@ const mainGameLoop = (() => {
 		});
 	});
 })();
+function playWithAi(_player1, _player2) {
+	let turn = 1;
+	document.querySelectorAll(".cell").forEach((item) => {
+		if (item.dataset.player == 2)
+			item.addEventListener("click", (e) => attackComputer(e));
+	});
+	function attackComputer(e) {
+		if (turn % 2 !== 0) {
+			let coordinate = [e.target.dataset.i, e.target.dataset.j];
+			let status = attack(coordinate, _player2, e);
+			if (status === "attacked ship") {
+				turnDisplay.textContent = "you can attack again";
+			} else if (status === "already attacked, attack somewhere else") {
+				turnDisplay.textContent = status;
+			} else {
+				let x = computerAttacks(_player1);
+				if (x == "computer attack over") turn += 1;
+			}
+		}
+	}
+}
+function computerAttacks(
+	humanPlayer,
+	aiCoordinate = helperFunction.generateCoord()
+) {
+	turnDisplay.textContent = "computer attacking";
+
+	setTimeout(() => {
+		// console.log(`attacking ${aiCoordinate}`);
+		let status = attack(aiCoordinate, humanPlayer);
+		// console.log(status);
+		const attackedCell = document.querySelector(
+			`.cell[data-player="1"][data-i="${aiCoordinate[0]}"][data-j="${aiCoordinate[1]}"]`
+		);
+		attackedCell.classList.contains("placed")
+			? (attackedCell.style.backgroundColor = "red")
+			: (attackedCell.style.backgroundColor = "white");
+
+		//logic
+		if (status === "attacked ship") {
+			turnDisplay.textContent = "computer attacks again";
+			computerAttacks(humanPlayer);
+		} else if (status === "already attacked, attack somewhere else") {
+			turnDisplay.textContent = "computer attacks somewhere else";
+			computerAttacks(humanPlayer);
+		} else return "computer attack over";
+	}, 1000);
+}
 function startTurn(_player1, _player2) {
 	let turn = 1;
 	const domTurnText = document.querySelector(".turn");
@@ -95,13 +144,13 @@ function startTurn(_player1, _player2) {
 		}
 	}
 }
-
 function attack(_coordinate, _p, e) {
 	let status = _p.gameBoard.receiveAttack(_coordinate);
-
-	e.target.classList.contains("placed")
-		? (e.target.style.backgroundColor = "red")
-		: (e.target.style.backgroundColor = "white");
+	if (e) {
+		e.target.classList.contains("placed")
+			? (e.target.style.backgroundColor = "red")
+			: (e.target.style.backgroundColor = "white");
+	}
 	return status;
 }
 function placeShipsRandomly(player, num) {
