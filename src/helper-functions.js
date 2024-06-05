@@ -29,7 +29,27 @@ const helperFunction = (() => {
 		const randomNumber = Math.random();
 		return randomNumber < 0.5 ? "horizontal" : "vertical";
 	}
-	function generateSmartCo(previousCo) {}
+	function validateCo(co) {
+		if (co[0] < 8 && co[0] >= 0 && co[1] < 8 && co[1] >= 0) return true;
+		else return false;
+	}
+	function generateSmartCo(previousCo) {
+		let newCo = [];
+		let dir = randomDirection();
+		if (dir == "horizontal") {
+			newCo =
+				Math.random() < 0.5
+					? [previousCo[0], previousCo[1] + 1]
+					: [previousCo[0], previousCo[1] - 1];
+		} else {
+			newCo =
+				Math.random() < 0.5
+					? [previousCo[0] + 1, previousCo[1]]
+					: [previousCo[0] - 1, previousCo[1]];
+		}
+		if (validateCo(newCo)) return newCo;
+		else return generateSmartCo(previousCo);
+	}
 
 	return {
 		getRandomInt,

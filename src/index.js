@@ -47,56 +47,58 @@ const mainGameLoop = (() => {
 	});
 })();
 function playWithAi(_player1, _player2) {
-	let turn = 1;
 	document.querySelectorAll(".cell").forEach((item) => {
 		if (item.dataset.player == 2)
-			item.addEventListener("click", (e) => attackComputer(e));
+			item.addEventListener("click", attackComputer);
 	});
 	function attackComputer(e) {
-		if (turn % 2 !== 0) {
-			let coordinate = [e.target.dataset.i, e.target.dataset.j];
-			let status = attack(coordinate, _player2, e);
-			if (status === "attacked ship") {
-				turnDisplay.textContent = "you can attack again";
-			} else if (status === "already attacked, attack somewhere else") {
-				turnDisplay.textContent = status;
-			} else {
-				let x = computerAttacks(_player1);
-				if (x == "computer attack over") turn += 1;
-			}
+		let coordinate = [e.target.dataset.i, e.target.dataset.j];
+		let status = attack(coordinate, _player2, e);
+		checkSunkShips(_player1, _player2, attackComputer);
+		if (status === "attacked ship") {
+		} else if (status === "already attacked, attack somewhere else") {
+			// turnDisplay.textContent = status;
+		} else {
+			computerAttacks(_player1, helperFunction.generateCoord(), [
+				_player1,
+				_player2,
+				attackComputer,
+			]);
 		}
 	}
 }
-function computerAttacks(
-	humanPlayer,
-	aiCoordinate = helperFunction.generateCoord()
-) {
-	turnDisplay.textContent = "computer attacking";
+function computerAttacks(humanPlayer, aiCoordinate, arr) {
+	let status = attack(aiCoordinate, humanPlayer);
+	const attackedCell = document.querySelector(
+		`.cell[data-player="1"][data-i="${aiCoordinate[0]}"][data-j="${aiCoordinate[1]}"]`
+	);
+	attackedCell.classList.contains("placed")
+		? (attackedCell.style.backgroundColor = "red")
+		: (attackedCell.style.backgroundColor = "white");
 
-	setTimeout(() => {
-		// console.log(`attacking ${aiCoordinate}`);
-		let status = attack(aiCoordinate, humanPlayer);
-		// console.log(status);
-		const attackedCell = document.querySelector(
-			`.cell[data-player="1"][data-i="${aiCoordinate[0]}"][data-j="${aiCoordinate[1]}"]`
-		);
-		attackedCell.classList.contains("placed")
-			? (attackedCell.style.backgroundColor = "red")
-			: (attackedCell.style.backgroundColor = "white");
+	//logic
+	if (status === "attacked ship") {
+		let gameOver = checkSunkShips(arr[0], arr[1], arr[2]);
+		if (gameOver != true)
+			computerAttacks(
+				humanPlayer,
+				helperFunction.generateSmartCo(aiCoordinate),
+				arr
+			);
+	} else if (status === "already attacked, attack somewhere else") {
+		return computerAttacks(humanPlayer, helperFunction.generateCoord(), arr);
+	} else return "computer attack over";
+}
+function handleWin(_player, func) {
+	alert(`${_player.name} wins`);
 
-		//logic
-		if (status === "attacked ship") {
-			turnDisplay.textContent = "computer attacks again";
-			computerAttacks(humanPlayer);
-		} else if (status === "already attacked, attack somewhere else") {
-			turnDisplay.textContent = "computer attacks somewhere else";
-			computerAttacks(humanPlayer);
-		} else return "computer attack over";
-	}, 1000);
+	document.querySelectorAll(".cell").forEach((item) => {
+		item.removeEventListener("click", func);
+	});
 }
 function startTurn(_player1, _player2) {
 	let turn = 1;
-	const domTurnText = document.querySelector(".turn");
+	const domTurnText = document.querySelector(".turn-display");
 	domTurnText.textContent = `${_player1.name}'s turn`;
 	document.querySelectorAll(".cell").forEach((item) => {
 		item.addEventListener("click", handleAttack);
@@ -107,15 +109,7 @@ function startTurn(_player1, _player2) {
 			? (domTurnText.textContent = `${_player1.name}'s turn`)
 			: (domTurnText.textContent = `${_player2.name}'s turn`);
 	}
-	function handleWin(_player) {
-		setTimeout(() => {
-			alert(`${_player.name} wins`);
-		}, 100);
 
-		document.querySelectorAll(".cell").forEach((item) => {
-			item.removeEventListener("click", handleAttack);
-		});
-	}
 	function handleStatus(_status, n) {
 		if (_status === "attacked ship") {
 			setTimeout(() => {
@@ -126,8 +120,7 @@ function startTurn(_player1, _player2) {
 		} else {
 			updateTurn(n);
 		}
-		if (_player1.gameBoard.allSunk()) handleWin(_player2);
-		if (_player2.gameBoard.allSunk()) handleWin(_player1);
+		checkSunkShips(_player1, _player2, handleAttack);
 	}
 	function handleAttack(e) {
 		let coordinate = [e.target.dataset.i, e.target.dataset.j];
@@ -142,6 +135,16 @@ function startTurn(_player1, _player2) {
 			let status = attack(coordinate, _player1, e);
 			handleStatus(status, 1);
 		}
+	}
+}
+function checkSunkShips(p1, p2, func) {
+	if (p1.gameBoard.allSunk()) {
+		handleWin(p2, func);
+		return true;
+	}
+	if (p2.gameBoard.allSunk()) {
+		handleWin(p1, func);
+		return true;
 	}
 }
 function attack(_coordinate, _p, e) {
