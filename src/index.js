@@ -199,9 +199,11 @@ function displayGameboards(player, num) {
 		cell.dataset.i = item.i;
 		cell.dataset.j = item.j;
 		if (item.placed !== undefined) {
-			cell.style.backgroundColor = "yellow";
 			cell.classList.add("placed");
-			cell.textContent = `${item.placed}`;
+			if (num === 1) {
+				cell.style.backgroundColor = "yellow";
+				cell.textContent = `${item.placed}`;
+			}
 		}
 		gbInterface.appendChild(cell);
 	});
@@ -216,16 +218,57 @@ function addShipsToContainer(player, num) {
 	btnPlaceShipRandomly.classList.add("btn-place-ships-randomly");
 	playerInterface.appendChild(btnPlaceShipRandomly);
 
-	// const container = document.createElement("div");
-	// container.classList.add("ships-container");
-	// player.gameBoard.ships.forEach((item) => {
-	// 	const ship = document.createElement("div");
-	// 	ship.classList.add("ship");
-	// 	ship.textContent = "ship";
-	// 	ship.style.width = 50 * item.length + "px";
-	// 	container.appendChild(ship);
-	// });
-	// playerInterface.appendChild(container);
+	const container = document.createElement("div");
+	container.classList.add("ships-container");
+
+	player.gameBoard.ships.forEach((item) => {
+		const ship = document.createElement("div");
+		ship.classList.add("ship");
+		ship.dataset.length = item.length;
+		ship.dataset.direction = "horizontal";
+		ship.setAttribute("draggable", "true");
+		// ship.textContent = `${item.length}`;
+		// ship.style.width = 50 * item.length + "px";
+		for (let i = 1; i <= item.length; i++) {
+			const shipPart = document.createElement("div");
+			shipPart.classList.add("ship-part");
+			shipPart.textContent = item.length;
+			ship.appendChild(shipPart);
+		}
+		container.appendChild(ship);
+	});
+	playerInterface.appendChild(container);
+	dragShips();
+}
+function dragShips() {
+	const cells = document.querySelectorAll(".cell");
+	const draggables = document.querySelectorAll(".ship");
+	draggables.forEach((draggable) => {
+		draggable.addEventListener("dragstart", () => {
+			draggable.classList.add("dragging");
+		});
+		draggable.addEventListener("dragend", () => {
+			draggable.classList.remove("dragging");
+		});
+	});
+	cells.forEach((cell) => {
+		cell.addEventListener("dragover", (e) => {
+			e.preventDefault();
+			const dragging = document.querySelector(".dragging");
+			cell.classList.add(".placed");
+			cell.appendChild(dragging);
+		});
+		cell.addEventListener("drop", (e) => {
+			// const dragging = document.querySelector(".dragging");
+			e.preventDefault();
+			console.log("dropped");
+			// if (dragging.dataset.length > 1) {
+			// 	if (dragging.dataset.direction == "horizontal") {
+			// 		cell.nextElementSibling.style.backgroundColor = "red";
+			// 	}
+			// }
+		});
+	});
 }
 function displayShipsOnGameboard(player, num) {
 	const gameBoardInterface = document.querySelector(`.gi-${num}`);
